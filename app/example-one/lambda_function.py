@@ -20,6 +20,6 @@ def lambda_handler(event, context):
     )
 
     return {
-        statusCode: 200,
-        message: f'example step one complete'
+        'statusCode': 200,
+        'message': f'example step one complete'
     }
