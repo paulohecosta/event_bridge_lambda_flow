@@ -45,7 +45,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: ${AWS::StackName}-example-one
-      CodeUri: s3://coins-artifacts/builds/f7961ef94812ef28ceaecf5f0a20af9b
+      CodeUri: s3://coins-artifacts/builds/fc0993365d00031a29e8fed0b3501585
       Handler: lambda_function.lambda_handler
       Runtime: python3.7
       Timeout: 900
@@ -62,7 +62,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: ${AWS::StackName}-example-two
-      CodeUri: s3://coins-artifacts/builds/2adb78ee3d04d885d38a41e037c8c718
+      CodeUri: s3://coins-artifacts/builds/ae747a010cb020883284b5398060b3ef
       Handler: lambda_function.lambda_handler
       Runtime: python3.7
       Timeout: 900
