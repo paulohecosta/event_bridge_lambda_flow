@@ -43,15 +43,6 @@ Resources:
       DisplayName: !Sub '${AWS::StackName}-events-topic'
       TopicName: !Sub '${AWS::StackName}-events-topic'
 
-
-  SNSEventsLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: "lambda:invokeFunction"
-      Principal: "sns.amazonaws.com"
-      SourceArn: !Ref SNSEvents
-      FunctionName: !GetAtt ExampleOne.Arn
-
   # LAMBDAS
   ExampleOne:
     Type: AWS::Serverless::Function
@@ -77,6 +68,14 @@ Resources:
       Role: !GetAtt LambdaRole.Arn
 
   # SNS Subscriptions
+  SNSEventsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: "lambda:invokeFunction"
+      Principal: "sns.amazonaws.com"
+      SourceArn: !Ref SNSEvents
+      FunctionName: !GetAtt ExampleTwo.Arn
+      
   SNSSubscriptionExample:
     Type: AWS::SNS::Subscription
     Properties:
