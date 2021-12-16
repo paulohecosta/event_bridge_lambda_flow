@@ -17,3 +17,15 @@ https://lumigo.io/blog/5-reasons-why-you-should-use-eventbridge-instead-of-sns/
 https://aws.amazon.com/pt/blogs/compute/reducing-custom-code-by-using-advanced-rules-in-amazon-eventbridge/
 
 http://man.hubwiz.com/docset/Boto3.docset/Contents/Resources/Documents/guide/cw-example-events.html
+
+
+### Slide Presentation
+
+#### Design Pattern - Domínios Online Agnósticos e Arquitetura a Evento Low Code
+
+#### Design Pattern - Observabilidade no Barramentos de Eventos com SNS/EventBridge
+
+#### Comparação de Custo - Os 64kb de cada Evento
+
+SNS, SQS e Event Bridge Transitam registros de até 256kb
+64kb cobra 1 transação -> 256kb cobram 4!!!
