@@ -36,6 +36,27 @@ Resources:
                     - 'logs:DescribeLogStreams'
                   Resource: '*'
 
+  # EventBridgeIAMrole:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service: !Sub events.amazonaws.com
+  #           Action: 'sts:AssumeRole'
+  #     Path: /
+  #     Policies:
+  #       - PolicyName: PutEventsDestinationBus
+  #         PolicyDocument:
+  #           Version: 2012-10-17
+  #           Statement:
+  #             - Effect: Allow
+  #               Action:
+  #                 - 'events:PutEvents'
+  #               Resource: '*'
+
   # SNS
   SNSEvents:
     Type: AWS::SNS::Topic
@@ -100,6 +121,7 @@ Resources:
       Targets: 
         - 
           Arn: !GetAtt ExampleTwo.Arn
+          Id: EventsToInvokeLambda
 
   PermissionForEventsToInvokeLambda:
     Type: AWS::Lambda::Permission

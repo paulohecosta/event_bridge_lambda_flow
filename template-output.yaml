@@ -45,7 +45,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: ${AWS::StackName}-example-one
-      CodeUri: s3://coins-artifacts/builds/fc0993365d00031a29e8fed0b3501585
+      CodeUri: s3://coins-artifacts/builds/6d2ff196f826d7d233d3ba72b8051553
       Handler: lambda_function.lambda_handler
       Runtime: python3.7
       Timeout: 900
@@ -62,7 +62,7 @@ Resources:
     Properties:
       FunctionName:
         Fn::Sub: ${AWS::StackName}-example-two
-      CodeUri: s3://coins-artifacts/builds/ae747a010cb020883284b5398060b3ef
+      CodeUri: s3://coins-artifacts/builds/2d717cc505b8e732e31d92b5f8a1fa85
       Handler: lambda_function.lambda_handler
       Runtime: python3.7
       Timeout: 900
@@ -92,6 +92,37 @@ Resources:
       TopicArn:
         Ref: SNSEvents
       FilterPolicy: '{"period": ["weekly"]}'
+  EventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: EventRule
+      EventPattern:
+        source:
+        - custom.example
+        detail-type:
+        - transaction
+        detail:
+          period:
+          - weekly
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - ExampleTwo
+          - Arn
+        Id: EventsToInvokeLambda
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+        - ExampleTwo
+        - Arn
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+        - EventRule
+        - Arn
   ExampleOneLogs:
     Type: AWS::Logs::LogGroup
     Properties:
