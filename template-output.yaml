@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Sample SAM Template for Event Bridge Examples\n"
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName:
+        Fn::Sub: ${AWS::StackName}-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: AllowLambdaGlobal
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:*
+            - s3:*
+            - sns:*
+            - events:*
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+            Resource: '*'
+  SNSEvents:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName:
+        Fn::Sub: ${AWS::StackName}-events-topic
+      TopicName:
+        Fn::Sub: ${AWS::StackName}-events-topic
+  SNSEventsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: SNSEvents
+      FunctionName:
+        Fn::GetAtt:
+        - ExampleOne
+        - Arn
+  ExampleOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-example-one
+      CodeUri: s3://coins-artifacts/builds/8670e943d27316e9827d46fb1243f468
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role:
+        Fn::GetAtt:
+        - LambdaRole
+        - Arn
+      Environment:
+        Variables:
+          SNS_NAME:
+            Ref: SNSEvents
+  ExampleTwo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName:
+        Fn::Sub: ${AWS::StackName}-example-two
+      CodeUri: s3://coins-artifacts/builds/00adc907b26e52c86e8c99bb66478b26
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role:
+        Fn::GetAtt:
+        - LambdaRole
+        - Arn
+  SNSSubscriptionExample:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint:
+        Fn::GetAtt:
+        - ExampleTwo
+        - Arn
+      Protocol: lambda
+      TopicArn:
+        Ref: SNSEvents
+      FilterPolicy: '{"period": ["weekly"]}'
+  CoinAnalysisLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+        - /
+        - - /aws/lambda
+          - Ref: ExampleTwo
+      RetentionInDays: 5

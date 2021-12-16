@@ -40,8 +40,8 @@ Resources:
   SNSEvents:
     Type: AWS::SNS::Topic
     Properties: 
-      DisplayName: !Sub '${ProjectName}-events-topic'
-      TopicName: !Sub '${ProjectName}-events-topic'
+      DisplayName: !Sub '${AWS::StackName}-events-topic'
+      TopicName: !Sub '${AWS::StackName}-events-topic'
 
 
   SNSEventsLambdaPermission:
@@ -83,7 +83,7 @@ Resources:
       Endpoint: !GetAtt ExampleTwo.Arn
       Protocol: lambda
       TopicArn: !Ref SNSEvents
-      FilterPolicy: '{"period": "weekly"}'
+      FilterPolicy: '{"period": ["weekly"]}'
 
   # LOGS
   CoinAnalysisLogs:
