@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Sample SAM Template for Event Bridge Examples
+
+Resources:
+  # ROLES
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      RoleName: !Sub '${AWS::StackName}-lambda-role'
+      AssumeRolePolicyDocument: 
+        Version: '2012-10-17'
+        Statement: 
+          Effect: 'Allow'
+          Principal: 
+            Service: 
+              - 'lambda.amazonaws.com'
+          Action: 
+            - 'sts:AssumeRole'
+      Path: '/'
+      Policies:
+          - PolicyName: AllowLambdaGlobal
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: 'Allow'
+                  Action:
+                    - 'dynamodb:*'
+                    - 's3:*'
+                    - 'sns:*'
+                    - 'events:*'
+                    - 'logs:CreateLogGroup'
+                    - 'logs:CreateLogStream'
+                    - 'logs:PutLogEvents'
+                    - 'logs:DescribeLogStreams'
+                  Resource: '*'
+
+  # SNS
+  SNSEvents:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub '${ProjectName}-events-topic'
+      TopicName: !Sub '${ProjectName}-events-topic'
+
+
+  SNSEventsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: "lambda:invokeFunction"
+      Principal: "sns.amazonaws.com"
+      SourceArn: !Ref SNSEvents
+      FunctionName: !GetAtt ExampleOne.Arn
+
+  # LAMBDAS
+  ExampleOne:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-example-one'
+      CodeUri: ./app/example-one
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role: !GetAtt LambdaRole.Arn
+      Environment:
+        Variables:
+          SNS_NAME: !Ref SNSEvents
+
+  ExampleTwo:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-example-two'
+      CodeUri: ./app/example-two
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role: !GetAtt LambdaRole.Arn
+
+  # SNS Subscriptions
+  SNSSubscriptionExample:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt ExampleTwo.Arn
+      Protocol: lambda
+      TopicArn: !Ref SNSEvents
+      FilterPolicy: '{"period": "weekly"}'
+
+  # LOGS
+  CoinAnalysisLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['/', ['/aws/lambda', !Ref ExampleOne]]
+      RetentionInDays: 5
+
+  CoinAnalysisLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ['/', ['/aws/lambda', !Ref ExampleTwo]]
+      RetentionInDays: 5
