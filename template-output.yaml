@@ -40,17 +40,6 @@ Resources:
         Fn::Sub: ${AWS::StackName}-events-topic
       TopicName:
         Fn::Sub: ${AWS::StackName}-events-topic
-  SNSEventsLambdaPermission:
-    Type: AWS::Lambda::Permission
-    Properties:
-      Action: lambda:invokeFunction
-      Principal: sns.amazonaws.com
-      SourceArn:
-        Ref: SNSEvents
-      FunctionName:
-        Fn::GetAtt:
-        - ExampleOne
-        - Arn
   ExampleOne:
     Type: AWS::Serverless::Function
     Properties:
@@ -81,6 +70,17 @@ Resources:
         Fn::GetAtt:
         - LambdaRole
         - Arn
+  SNSEventsLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:invokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: SNSEvents
+      FunctionName:
+        Fn::GetAtt:
+        - ExampleTwo
+        - Arn
   SNSSubscriptionExample:
     Type: AWS::SNS::Subscription
     Properties:
@@ -92,7 +92,16 @@ Resources:
       TopicArn:
         Ref: SNSEvents
       FilterPolicy: '{"period": ["weekly"]}'
-  CoinAnalysisLogs:
+  ExampleOneLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName:
+        Fn::Join:
+        - /
+        - - /aws/lambda
+          - Ref: ExampleOne
+      RetentionInDays: 5
+  ExampleTwoLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName:
