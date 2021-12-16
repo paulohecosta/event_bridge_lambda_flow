@@ -4,18 +4,17 @@ import os
 
 def lambda_handler(event, context):
     print('lambda_handler example step one')
-    message = {"foo": "bar"}
     
     client = boto3.client('sns')
 
     response = client.publish(
         TargetArn=os.getenv('SNS_NAME'),
-        Message=json.dumps(message),
+        Message=json.dumps({"foo": "message in filter"}),
         MessageAttributes={'period': {'DataType': 'String', 'StringValue': 'weekly'}}
     )
     response = client.publish(
         TargetArn=os.getenv('SNS_NAME'),
-        Message=json.dumps(message),
+        Message=json.dumps({"foo": "message out filter"}),
         MessageAttributes={'period': {'DataType': 'String', 'StringValue': 'daily'}}
     )
 
