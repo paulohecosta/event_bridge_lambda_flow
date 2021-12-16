@@ -86,13 +86,13 @@ Resources:
       FilterPolicy: '{"period": ["weekly"]}'
 
   # LOGS
-  CoinAnalysisLogs:
+  ExampleOneLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join ['/', ['/aws/lambda', !Ref ExampleOne]]
       RetentionInDays: 5
 
-  CoinAnalysisLogs:
+  ExampleTwoLogs:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: !Join ['/', ['/aws/lambda', !Ref ExampleTwo]]
